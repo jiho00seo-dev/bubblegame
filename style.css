@@ -1,0 +1,187 @@
+:root {
+    --deep-ocean: #0a192f;
+    --water-blue: #1e3a8a;
+    --bubble-color: rgba(255, 255, 255, 0.4);
+    --bubble-border: rgba(255, 255, 255, 0.6);
+    --accent: #2dd4bf;
+    --text-white: #f8fafc;
+    --font-main: 'Outfit', sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+body {
+    background-color: var(--deep-ocean);
+    color: var(--text-white);
+    font-family: var(--font-main);
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Background Effects */
+.underwater-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, #1e40af, #0f172a);
+    z-index: -1;
+}
+
+.light-ray {
+    position: absolute;
+    top: -20%;
+    left: 10%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    transform: rotate(-15deg);
+    animation: rays 10s infinite alternate linear;
+}
+
+@keyframes rays {
+    from {
+        transform: rotate(-15deg) translateX(-50px);
+    }
+
+    to {
+        transform: rotate(-10deg) translateX(50px);
+    }
+}
+
+/* Game Layout */
+.game-container {
+    width: 100%;
+    height: 100%;
+    max-width: 800px;
+    max-height: 900px;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap: 20px;
+}
+
+.ui-panel {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.label {
+    font-size: 0.8rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    font-weight: 700;
+}
+
+.value {
+    font-size: 2rem;
+    font-weight: 900;
+}
+
+#game-canvas-wrapper {
+    flex: 1;
+    position: relative;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 30px;
+    border: 2px solid rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+    box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.3);
+}
+
+canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Overlays */
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgba(10, 25, 47, 0.85);
+    backdrop-filter: blur(5px);
+    z-index: 10;
+    text-align: center;
+    padding: 20px;
+    transition: opacity 0.3s ease;
+}
+
+.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+h1 {
+    font-size: 4rem;
+    font-weight: 900;
+    background: linear-gradient(45deg, #fff, var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+}
+
+.primary-btn {
+    margin-top: 30px;
+    padding: 15px 40px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: white;
+    background: var(--accent);
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(45, 212, 191, 0.3);
+    transition: all 0.3s ease;
+}
+
+.primary-btn:hover {
+    transform: translateY(-3px);
+    background: #14b8a6;
+    box-shadow: 0 15px 30px rgba(45, 212, 191, 0.4);
+}
+
+.pulse {
+    animation: pulse-animation 2s infinite;
+}
+
+@keyframes pulse-animation {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.bottom-panel {
+    justify-content: center;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.5);
+}

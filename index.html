@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bubble Pop - 버블 터뜨리기 게임</title>
+    <meta name="description" content="화면에 나타나는 버블을 터뜨려 점수를 얻으세요! 당신의 순발력을 테스트해보세요.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="underwater-bg">
+        <div class="light-ray"></div>
+        <div class="particle-system"></div>
+    </div>
+
+    <main class="game-container">
+        <div class="ui-panel top-panel">
+            <div class="score-board">
+                <span class="label">SCORE</span>
+                <span id="score" class="value">000</span>
+            </div>
+            <div class="timer">
+                <span class="label">TIME</span>
+                <span id="time" class="value">30s</span>
+            </div>
+        </div>
+
+        <section id="game-canvas-wrapper">
+            <canvas id="gameCanvas"></canvas>
+
+            <div id="start-screen" class="overlay">
+                <h1>Bubble Pop</h1>
+                <p>제한 시간 내에 최대한 많은 버블을 터뜨리세요!</p>
+                <button id="start-btn" class="primary-btn pulse">게임 시작</button>
+            </div>
+
+            <div id="result-screen" class="overlay hidden">
+                <h2>Game Over!</h2>
+                <div class="final-score">
+                    <span class="label">최종 점수</span>
+                    <span id="final-score-val" class="value">0</span>
+                </div>
+                <button id="restart-btn" class="primary-btn">다시 하기</button>
+            </div>
+        </section>
+
+        <div class="ui-panel bottom-panel">
+            <p>버블을 클릭하거나 터치하여 터뜨리세요!</p>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
