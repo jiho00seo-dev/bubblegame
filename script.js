@@ -3,8 +3,13 @@ const ctx = canvas.getContext('2d');
 const scoreElement = document.getElementById('score');
 const timeElement = document.getElementById('time');
 const levelElement = document.getElementById('level');
+
 const startScreen = document.getElementById('start-screen');
 const resultScreen = document.getElementById('result-screen');
+const levelTransitionScreen = document.getElementById('level-transition-screen');
+const nextLevelText = document.getElementById('next-level-text');
+const transitionProgress = document.getElementById('transition-progress');
+
 const finalScoreElement = document.getElementById('final-score-val');
 const startBtn = document.getElementById('start-btn');
 const restartBtn = document.getElementById('restart-btn');
@@ -12,7 +17,7 @@ const restartBtn = document.getElementById('restart-btn');
 let score = 0;
 let timeLeft = 10;
 let level = 1;
-let gameStatus = 'READY'; // READY, PLAYING, ENDED
+let gameStatus = 'READY'; // READY, PLAYING, TRANSITION, ENDED
 let bubbles = [];
 let animationId;
 let spawnTimer;
@@ -24,7 +29,7 @@ class Bubble {
         this.x = Math.random() * (canvas.width - this.radius * 2) + this.radius;
         this.y = canvas.height + this.radius;
         // 속도 증가: 기본 속도에 레벨 비례 가산
-        this.speed = (Math.random() * 2 + 1.5) * (1 + (currentLevel - 1) * 0.25);
+        this.speed = (Math.random() * 2 + 1.8) * (1 + (currentLevel - 1) * 0.3);
         this.color = `rgba(255, 255, 255, ${Math.random() * 0.3 + 0.1})`;
         this.wiggle = 0;
         this.wiggleSpeed = Math.random() * 0.05;
@@ -81,13 +86,13 @@ function spawnBubble() {
     if (gameStatus !== 'PLAYING') return;
     bubbles.push(new Bubble(level));
 
-    // 무작위 생성 간격 (레벨이 올라갈수록 조금 더 짧게)
-    const nextSpawn = (Math.random() * 700 + 300) / (1 + (level - 1) * 0.1);
+    // 무작위 생성 간격 (레벨이 올라갈수록 더 짧게)
+    const nextSpawn = (Math.random() * 600 + 400) / (1 + (level - 1) * 0.15);
     spawnTimer = setTimeout(spawnBubble, nextSpawn);
 }
 
 function animate() {
-    if (gameStatus !== 'PLAYING') {
+    if (gameStatus !== 'PLAYING' && gameStatus !== 'TRANSITION') {
         animationId = requestAnimationFrame(animate);
         return;
     }
@@ -95,8 +100,11 @@ function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     for (let i = bubbles.length - 1; i >= 0; i--) {
-        bubbles[i].update();
-        if (gameStatus !== 'PLAYING') break; // update 도중 endGame 호출될 수 있음
+        if (gameStatus === 'PLAYING') {
+            bubbles[i].update();
+        }
+
+        if (gameStatus === 'ENDED') break;
         bubbles[i].draw();
     }
 
@@ -118,8 +126,12 @@ function startLevel() {
     timeElement.textContent = `${timeLeft}s`;
     levelElement.textContent = level;
 
+    // UI 초기화
     startScreen.classList.add('hidden');
     resultScreen.classList.add('hidden');
+    levelTransitionScreen.classList.add('hidden');
+    transitionProgress.style.transition = 'none';
+    transitionProgress.style.width = '0%';
 
     if (spawnTimer) clearTimeout(spawnTimer);
     spawnBubble();
@@ -137,8 +149,28 @@ function startLevel() {
 }
 
 function nextLevel() {
+    gameStatus = 'TRANSITION';
     level++;
-    startLevel();
+
+    if (spawnTimer) clearTimeout(spawnTimer);
+
+    // 트랜지션 화면 표시
+    nextLevelText.textContent = `LEVEL ${level}`;
+    levelTransitionScreen.classList.remove('hidden');
+    levelTransitionScreen.classList.add('visible');
+
+    // 프로그레스 바 애니메이션
+    setTimeout(() => {
+        transitionProgress.style.transition = 'width 2s linear';
+        transitionProgress.style.width = '100%';
+    }, 50);
+
+    // 2초 후 다음 레벨 시작
+    setTimeout(() => {
+        levelTransitionScreen.classList.remove('visible');
+        levelTransitionScreen.classList.add('hidden');
+        setTimeout(startLevel, 400); // 페이드 아웃 후 시작
+    }, 2000);
 }
 
 function endGame(reason) {
@@ -147,6 +179,7 @@ function endGame(reason) {
     clearTimeout(spawnTimer);
 
     resultScreen.classList.remove('hidden');
+    resultScreen.classList.add('visible');
     finalScoreElement.textContent = score;
 
     if (reason === 'MISSED') {
@@ -169,7 +202,6 @@ canvas.addEventListener('mousedown', (e) => {
 
         if (dist < bubble.radius) {
             bubbles.splice(i, 1);
-            // 레벨 가중치 반영 점수
             score += Math.round((50 / (bubble.radius / 10)) * (1 + (level - 1) * 0.5));
             scoreElement.textContent = score.toString().padStart(3, '0');
             break;
@@ -183,11 +215,14 @@ canvas.addEventListener('touchstart', (e) => {
     const rect = canvas.getBoundingClientRect();
     const touch = e.touches[0];
     const mouseX = touch.clientX - rect.left;
-    const mouseY = touch.clientY - rect.top;
+    const mouseY = touch.top - rect.top; // Fixed: should be clientY
+
+    // Correcting the touch coordinate
+    const correctedY = touch.clientY - rect.top;
 
     for (let i = bubbles.length - 1; i >= 0; i--) {
         const bubble = bubbles[i];
-        const dist = Math.sqrt((mouseX - bubble.x) ** 2 + (mouseY - bubble.y) ** 2);
+        const dist = Math.sqrt((mouseX - bubble.x) ** 2 + (correctedY - bubble.y) ** 2);
         if (dist < bubble.radius) {
             bubbles.splice(i, 1);
             score += Math.round((50 / (bubble.radius / 10)) * (1 + (level - 1) * 0.5));
